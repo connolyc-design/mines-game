@@ -1,4 +1,4 @@
-# 🎟️ Scratch 100 — 25¢ a Square
+# 🎟️ Tokyo Money — 25¢ a Square
 
 A single-page scratch-card game. The board has **100 squares**. Each square costs
 **25¢** to scratch. Cash prizes are hidden around the board — you see what you got
