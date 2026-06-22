@@ -1,50 +1,44 @@
-# 💎 Mines — Risk-Free Edition
+# 🍀 Lucky 5 — Pick a Square
 
-A single-page web game modeled on the casino game **Mines**, but with **no betting
-and no way to lose your balance**. The player can only gain points — over time the
-Balance is monotonically non-decreasing.
+A simple single-page betting game. There are **25 squares; 5 of them are lucky
+winners**. Place a bet, tap one square, and find out instantly whether you won.
+
+- **Win** (you tapped a lucky square): your bet pays **5×**.
+- **Lose** (you tapped a blank): you lose your bet.
+
+You're told the result right away, and the lucky squares are revealed.
 
 ## How to run
 
 No build step, no dependencies, no backend. Just open the file:
 
 ```bash
-# from the project root
 open index.html        # macOS
 xdg-open index.html    # Linux
 start index.html       # Windows
 ```
 
-Or double-click `index.html` in a file browser. It also works fine served from any
-static host (e.g. `python3 -m http.server` then visit `http://localhost:8000`).
+Or double-click `index.html`. It also works on any static host
+(`python3 -m http.server`, GitHub Pages, etc.).
+
+### Play it online
+
+Live on GitHub Pages: <https://connolyc-design.github.io/mines-game/>
 
 ## How to play
 
-1. Pick a **mine count** (1–24) with the slider before flipping your first tile.
-2. Flip tiles one at a time. Each **gem** 💎 raises your **round multiplier**.
-3. Hit **Cash Out** to bank `roundStake × multiplier` into your Balance and start a
-   new round. Cash Out is disabled until you've found at least one gem.
-4. Flip a **mine** 💣 and the round ends — you forfeit **only this round's pending
-   win**. Your Balance is never reduced.
-5. Clear every gem on the board for an automatic perfect-clear payout.
+1. Set your **bet** with the − / + buttons or the quick chips (10 / 50 / 100 / Max).
+2. Tap any square.
+3. **💎 lucky square** → you win your bet × 5, shown immediately.
+   **✕ blank** → you lose your bet, shown immediately.
+4. Tap **Play Again** for a new round. If you ever hit 0 points, Play Again
+   gives you free chips so you can keep playing.
 
-### The "no losses" rule (design choice)
+## Odds & payout
 
-Hitting a mine forfeits the unbanked round multiplier only. The persistent Balance
-never goes down — there's no stake deducted and no real money. This is the one
-intentional deviation from real Mines, kept per the spec.
-
-## Multiplier math
-
-After revealing `k` gems with `M` mines on a 25-tile grid:
-
-```
-multiplier(k) = 0.99 × Π (i = 0 .. k-1) of (25 - i) / (25 - M - i)
-round winnings = roundStake × multiplier(k)
-```
-
-The `0.99` is the house edge. The live multiplier and projected winnings update as
-you reveal gems, and the side panel previews the next-gem multiplier.
+5 winners out of 25 squares is a **1-in-5** chance. A **5× payout** is fair
+(no house edge): over many plays your balance trends roughly flat, with swings.
+Lower the payout in `CONFIG` if you want a house edge.
 
 ## Where to tweak things
 
@@ -53,31 +47,23 @@ All gameplay constants live in the `CONFIG` block at the top of the `<script>` i
 
 ```js
 const CONFIG = {
-  GRID_SIZE: 25,          // total tiles (5x5); the multiplier math assumes 25
-  STARTING_BALANCE: 1000, // points the player starts with
-  ROUND_STAKE: 100,       // virtual basis for round winnings (NOT deducted)
-  DEFAULT_MINES: 3,       // initial mine count
-  MIN_MINES: 1,           // slider lower bound
-  MAX_MINES: 24,          // slider upper bound
-  HOUSE_EDGE: 0.99        // the 0.99 factor in the multiplier formula
+  GRID_SIZE: 25,           // total tiles (5x5)
+  WINNERS: 5,              // number of lucky/correct squares
+  PAYOUT: 5,               // a winning pick returns bet × PAYOUT (5 = fair odds)
+  STARTING_BALANCE: 1000,  // points the player starts with
+  DEFAULT_BET: 100,        // starting bet amount
+  BET_STEP: 10,            // +/- button increment
+  MIN_BET: 10,             // smallest allowed bet
+  RESET_BALANCE: 1000      // free chips given if the player hits 0
 };
 ```
 
-- **Mine count**: change in-game with the slider, or set `DEFAULT_MINES`.
-- **Starting balance**: `STARTING_BALANCE`.
-- **Round stake**: `ROUND_STAKE` (the fixed virtual basis for round winnings).
-
-## Features
-
-- 5×5 grid with flip animations; green gems, red bombs.
-- Dark, modern casino aesthetic; fully mobile-responsive.
-- Live Balance, multiplier, projected round winnings, gems-found counter.
-- Mine-count slider (1–24), locked once you flip the first tile of a round.
-- Satisfying Cash Out flash and a "boom" reveal of all tiles on a mine hit.
-- Optional sound (synthesized via WebAudio — no asset files).
-- In-memory "Best balance" tracker.
+- **Number of winners**: `WINNERS`.
+- **Payout multiplier**: `PAYOUT`.
+- **Starting balance / bet**: `STARTING_BALANCE`, `DEFAULT_BET`.
 
 ## Tech
 
-Plain, self-contained `index.html` with vanilla JS and CSS. No backend, no external
-accounts, no real money. All state is kept in memory.
+Plain, self-contained `index.html` with vanilla JS and CSS. No backend, no
+external accounts, no real money. All state is kept in memory. Mobile-responsive,
+with an optional WebAudio sound toggle (no asset files).
